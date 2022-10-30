@@ -14,8 +14,7 @@
 
 from pathlib import Path
 from typing import Dict, List, Mapping, Optional, Tuple, Union
-
-from model_navigator.converter.config import TensorRTPrecision
+from model_navigator.converter.config import TensorRTPrecision, TensorRTPrecisionMode
 from model_navigator.framework_api.commands.performance import ProfilerConfig
 from model_navigator.framework_api.common import SizedDataLoader
 from model_navigator.framework_api.config import Config
@@ -45,6 +44,7 @@ def export(
     model,
     dataloader: SizedDataLoader,
     target_precisions: Optional[Union[Union[str, TensorRTPrecision], Tuple[Union[str, TensorRTPrecision], ...]]] = None,
+    precision_mode: Optional[Union[str, TensorRTPrecisionMode]] = None,
     max_workspace_size: Optional[int] = None,
     minimum_segment_size: int = 3,
     model_name: Optional[str] = None,
@@ -97,15 +97,19 @@ def export(
     if profiler_config is None:
         profiler_config = ProfilerConfig()
 
+    if precision_mode is None:
+        precision_mode = TensorRTPrecisionMode.HIERARCHY
+
     forward_kw_names = None
     sample = next(iter(dataloader))
     if isinstance(sample, Mapping):
         forward_kw_names = tuple(sample.keys())
 
-    target_formats, target_precisions, runtimes = (
+    target_formats, target_precisions, runtimes, precision_mode = (
         enums.parse(target_formats, Format),
         enums.parse(target_precisions, TensorRTPrecision),
         enums.parse(runtimes, RuntimeProvider),
+        *enums.parse(precision_mode, TensorRTPrecisionMode),
     )
     config = Config(
         Framework.TF2,
@@ -113,6 +117,7 @@ def export(
         model_name=model_name,
         dataloader=dataloader,
         target_precisions=target_precisions,
+        precision_mode=precision_mode,
         max_workspace_size=max_workspace_size,
         minimum_segment_size=minimum_segment_size,
         workdir=workdir,
