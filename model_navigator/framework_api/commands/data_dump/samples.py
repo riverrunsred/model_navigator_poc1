@@ -113,7 +113,7 @@ class FetchInputModelData(Command):
             do_sample_profiling = False
             for name in input_metadata:
                 print(f'name ==> {name}')
-                print(f"DEBUG --> {sample}")
+                print(f"sample.name --> {sample[name]}")
                 for (ax, shapes), tensor_dim in zip(
                     enumerate(zip(trt_profile[name].min, trt_profile[name].opt, trt_profile[name].max)),
                     sample[name].shape,
