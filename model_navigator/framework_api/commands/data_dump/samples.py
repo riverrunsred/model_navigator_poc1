@@ -105,7 +105,8 @@ class FetchInputModelData(Command):
             if i >= len(dataloader):
                 break
             sample = extract_sample(sample, input_metadata, framework)
-
+            if i == 0:
+                print(f"DEBUG --> {sample}")
             if i in correctness_samples_ind:
                 correctness_samples.append(extract_bs1(sample, batch_dim))
             do_sample_conversion = False
