@@ -105,8 +105,6 @@ class FetchInputModelData(Command):
             if i >= len(dataloader):
                 break
             sample = extract_sample(sample, input_metadata, framework)
-            if i == 0:
-                print(f"DEBUG --> {sample}")
             if i in correctness_samples_ind:
                 correctness_samples.append(extract_bs1(sample, batch_dim))
             do_sample_conversion = False
@@ -114,9 +112,9 @@ class FetchInputModelData(Command):
             for name in input_metadata:
                 print(f'name ==> {name}')
                 try:
-                    print(f"sample.name --> {sample[name]}")
+                    print(f"sample.name --> {sample[name].shape}")
                 except:
-                    print(f"An exception occurred at sample: {sample}") 
+                    print(f"An exception occurred at sample: {sample} at i: {i}") 
                 for (ax, shapes), tensor_dim in zip(
                     enumerate(zip(trt_profile[name].min, trt_profile[name].opt, trt_profile[name].max)),
                     sample[name].shape,
